@@ -36,7 +36,13 @@ public class HomePage {
     }
 
     public void navigateToHomePage(String baseUrl) {
-        page.navigate(baseUrl);
+        page.waitForResponse(
+            response -> response.url().contains("/img/products/") && response.status() == 200,
+            () -> {
+                page.navigate(baseUrl);
+            }
+        );
+        //page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
     }
 
     public void filterByCategory(String categoryName) {
