@@ -21,8 +21,7 @@ public class HeaderComponent {
     }
 
     private Locator contactLink() {
-        return page.getByRole(com.microsoft.playwright.options.AriaRole.LINK,
-                new Page.GetByRoleOptions().setName("Contact"));
+        return page.getByText("Contact", new Page.GetByTextOptions().setExact(true));
     }
 
     private Locator signInLink() {

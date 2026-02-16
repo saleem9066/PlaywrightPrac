@@ -2,6 +2,7 @@ package steps;
 
 import com.aventstack.extentreports.Status;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.assertions.PlaywrightAssertions;
 import config.ConfigReader;
 import hooks.Hooks;
 import io.cucumber.java.en.Given;
@@ -202,7 +203,16 @@ public class HomeSteps {
     @When("user clicks on contact link")
     public void userClicksOnContactLink() {
         Hooks.getExtentTest().log(Status.INFO, "Clicking on contact link");
-        header.navigateToContact();
+        com.microsoft.playwright.Locator contactLink = page.getByText("Contact",
+                new Page.GetByTextOptions().setExact(true));
+
+        PlaywrightAssertions.assertThat(contactLink).isVisible();
+        page.waitForResponse(
+                response -> response.url().contains("/contact") || response.status() == 200,
+                () -> {
+                    contactLink.click();
+                }
+        );
         Hooks.getExtentTest().log(Status.PASS, "Navigated to contact page");
     }
 

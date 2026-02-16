@@ -2,6 +2,7 @@ package steps;
 
 import com.aventstack.extentreports.Status;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.assertions.PlaywrightAssertions;
 import config.ConfigReader;
 import hooks.Hooks;
 import io.cucumber.datatable.DataTable;
@@ -166,34 +167,28 @@ public class ContactFormSteps {
         Hooks.getExtentTest().log(Status.INFO, "Verifying success message contains: " + expectedMessage);
 
         try {
-            Hooks.getPage().waitForTimeout(500);
+            com.microsoft.playwright.Locator alertLocator = Hooks.getPage().getByRole(
+                com.microsoft.playwright.options.AriaRole.ALERT
+            );
 
-            if (!contactPage.isSuccessMessageDisplayed()) {
-                String errorMsg = "ASSERTION FAILED: Success message alert is not displayed on the page";
-                Hooks.getExtentTest().log(Status.FAIL, errorMsg);
-                throw new AssertionError(errorMsg);
-            }
+            PlaywrightAssertions.assertThat(alertLocator).isVisible();
+            PlaywrightAssertions.assertThat(alertLocator).containsText(expectedMessage);
 
-            String actualMessage = contactPage.getAlertMessage();
+            String actualMessage = alertLocator.textContent();
             Hooks.getExtentTest().log(Status.INFO, "Actual message: '" + actualMessage + "'");
             Hooks.getExtentTest().log(Status.INFO, "Expected message: '" + expectedMessage + "'");
-
-            if (!contactPage.doesAlertContainText(expectedMessage)) {
-                String errorMsg = String.format(
-                    "ASSERTION FAILED: Alert message does not contain expected text\n" +
-                    "Expected to contain: '%s'\n" +
-                    "Actual message: '%s'\n" +
-                    "Step: Then success message should be displayed with text \"%s\"",
-                    expectedMessage, actualMessage, expectedMessage
-                );
-                Hooks.getExtentTest().log(Status.FAIL, errorMsg);
-                throw new AssertionError(errorMsg);
-            }
-
             Hooks.getExtentTest().log(Status.PASS, "✓ Success message verified successfully");
 
         } catch (AssertionError e) {
-            throw e; // Re-throw to fail the test
+            String errorMsg = String.format(
+                "ASSERTION FAILED: Alert message validation failed\n" +
+                "Expected to contain: '%s'\n" +
+                "Error: %s\n" +
+                "Step: Then success message should be displayed with text \"%s\"",
+                expectedMessage, e.getMessage(), expectedMessage
+            );
+            Hooks.getExtentTest().log(Status.FAIL, errorMsg);
+            throw new AssertionError(errorMsg, e);
         } catch (Exception e) {
             String errorMsg = String.format(
                 "EXCEPTION OCCURRED while verifying success message\n" +
@@ -212,32 +207,28 @@ public class ContactFormSteps {
         Hooks.getExtentTest().log(Status.INFO, "Verifying error message contains: " + expectedError);
 
         try {
-            if (!contactPage.isSuccessMessageDisplayed()) {
-                String errorMsg = "ASSERTION FAILED: Error message alert is not displayed on the page";
-                Hooks.getExtentTest().log(Status.FAIL, errorMsg);
-                throw new AssertionError(errorMsg);
-            }
+            com.microsoft.playwright.Locator alertLocator = Hooks.getPage().getByRole(
+                com.microsoft.playwright.options.AriaRole.ALERT
+            );
 
-            String actualMessage = contactPage.getAlertMessage();
+            PlaywrightAssertions.assertThat(alertLocator).isVisible();
+            PlaywrightAssertions.assertThat(alertLocator).containsText(expectedError);
+
+            String actualMessage = alertLocator.textContent();
             Hooks.getExtentTest().log(Status.INFO, "Actual error: '" + actualMessage + "'");
             Hooks.getExtentTest().log(Status.INFO, "Expected error: '" + expectedError + "'");
-
-            if (!contactPage.doesAlertContainText(expectedError)) {
-                String errorMsg = String.format(
-                    "ASSERTION FAILED: Error message does not contain expected text\n" +
-                    "Expected to contain: '%s'\n" +
-                    "Actual error message: '%s'\n" +
-                    "Step: Then error message should be displayed with text \"%s\"",
-                    expectedError, actualMessage, expectedError
-                );
-                Hooks.getExtentTest().log(Status.FAIL, errorMsg);
-                throw new AssertionError(errorMsg);
-            }
-
             Hooks.getExtentTest().log(Status.PASS, "✓ Error message verified successfully");
 
         } catch (AssertionError e) {
-            throw e; // Re-throw to fail the test
+            String errorMsg = String.format(
+                "ASSERTION FAILED: Error message validation failed\n" +
+                "Expected to contain: '%s'\n" +
+                "Error: %s\n" +
+                "Step: Then error message should be displayed with text \"%s\"",
+                expectedError, e.getMessage(), expectedError
+            );
+            Hooks.getExtentTest().log(Status.FAIL, errorMsg);
+            throw new AssertionError(errorMsg, e);
         } catch (Exception e) {
             String errorMsg = String.format(
                 "EXCEPTION OCCURRED while verifying error message\n" +

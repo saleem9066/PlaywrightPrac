@@ -89,20 +89,17 @@ public class Hooks {
             try {
                 Page.ScreenshotOptions screenshotOptions = new Page.ScreenshotOptions()
                         .setFullPage(configReader.isScreenshotFullPage())
-                        .setTimeout(30000); // 30 seconds timeout
+                        .setTimeout(30000);
                 byte[] screenshot = currentPage.screenshot(screenshotOptions);
                 String base64Screenshot = Base64.getEncoder().encodeToString(screenshot);
                 logger.info("Screenshot captured successfully (size: {} bytes)", screenshot.length);
 
-                String stepName = "Step: " + scenario.getName();
-
                 if (scenario.isFailed()) {
-                    logger.error("Step FAILED: {}", stepName);
-                    extentTest.get().log(Status.FAIL, stepName,
+                    logger.error("Step FAILED");
+                    extentTest.get().fail("Step failed",
                             MediaEntityBuilder.createScreenCaptureFromBase64String(base64Screenshot).build());
                 } else {
-                    logger.info("Step PASSED: {}", stepName);
-                    extentTest.get().log(Status.PASS, stepName,
+                    extentTest.get().pass("Step passed",
                             MediaEntityBuilder.createScreenCaptureFromBase64String(base64Screenshot).build());
                 }
             } catch (Exception e) {
