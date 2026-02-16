@@ -88,6 +88,10 @@ public class ConfigReader {
     }
 
     private String getProperty(String key, String defaultValue) {
+        String systemProperty = System.getProperty(key);
+        if (systemProperty != null && !systemProperty.isBlank()) {
+            return systemProperty;
+        }
         String envValue = System.getenv(key.toUpperCase().replace(".", "_"));
         if (envValue != null && !envValue.isBlank()) {
             return envValue;
